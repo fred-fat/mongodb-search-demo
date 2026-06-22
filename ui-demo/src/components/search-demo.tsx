@@ -9,7 +9,7 @@ type DemoMode = SearchMode | "suggest";
 
 const demoQueries = [
   { label: "自拍杆业务权重", query: "自拍杆", mode: "keyword" },
-  { label: "Flow 自动补全", query: "Fl", mode: "suggest" },
+  { label: "稳定器自动补全", query: "St", mode: "suggest" },
   { label: "云台同义词", query: "云台", mode: "synonyms" },
   { label: "全井相机纠错", query: "全井相机", mode: "fuzzy" },
   { label: "潜水防水装备", query: "我想潜水去水下拍鱼，或者冲浪用，需要能防水防雾的装备", mode: "semantic" },

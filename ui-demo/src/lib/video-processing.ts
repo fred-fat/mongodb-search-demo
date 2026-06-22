@@ -370,7 +370,7 @@ export async function processUploadedVideo(db: Db, videoId: string) {
 
     await videos.updateOne({ videoId }, { $set: { uploadStatus: "embedding_multimodal", updatedAt: new Date() } });
 
-    const tempDir = mkdtempSync(path.join(tmpdir(), "insta360-upload-process-"));
+    const tempDir = mkdtempSync(path.join(tmpdir(), "aha360-upload-process-"));
 
     try {
       for (const segment of segments) {

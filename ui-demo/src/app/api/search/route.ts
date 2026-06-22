@@ -54,7 +54,7 @@ function buildSearchStage(input: ReturnType<typeof normalizeRequest>) {
             query: input.query,
             path: input.mode === "fuzzy" ? "name" : input.mode === "synonyms" ? "description" : ["name", "description"],
             ...(input.mode === "fuzzy" ? { fuzzy: { maxEdits: 1 } } : {}),
-            ...(input.mode === "synonyms" ? { synonyms: "insta360_synonyms" } : {}),
+            ...(input.mode === "synonyms" ? { synonyms: "aha360_synonyms" } : {}),
           },
         },
       ]

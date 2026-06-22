@@ -1,6 +1,6 @@
-# Insta360 Atlas Search UI Demo
+# Aha360 Atlas Search UI Demo
 
-Interactive Next.js demo for showcasing MongoDB Atlas Search, Vector Search, hybrid retrieval, text embeddings, multimodal video embeddings, reranking, video segment search, and analytics against the `insta360_poc` PoC dataset.
+Interactive Next.js demo for showcasing MongoDB Atlas Search, Vector Search, hybrid retrieval, text embeddings, multimodal video embeddings, reranking, video segment search, and analytics against the `aha360_poc` PoC dataset.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ Use `.env.local.example` as the template:
 
 ```bash
 MONGODB_URI="<atlas connection string>"
-MONGODB_DB="insta360_poc"
+MONGODB_DB="aha360_poc"
 VOYAGE_API_KEY="<mongodb ai / voyage api key>"
 ```
 
@@ -79,7 +79,7 @@ Upload APIs:
 
 - Semantic Vector Search: natural language waterproof diving query
 - Keyword Search + Business Weight Ranking: `自拍杆`
-- Autocomplete: `Fl` and `稳`
+- Autocomplete: `St` and `稳`
 - Fuzzy Typo Tolerance: `全井相机`
 - Synonym Mapping: `云台` recalls `稳定器`
 - Category + Tag Filter: `配件` + `骑行`
@@ -87,8 +87,8 @@ Upload APIs:
 
 ## Notes
 
-- The UI uses original gradient placeholders and does not copy Insta360 website image assets.
-- Search and click events are written to `insta360_poc.search_events` for the operations preview panel.
+- The UI uses original gradient placeholders and does not copy Aha360 website image assets.
+- Search and click events are written to `aha360_poc.search_events` for the operations preview panel.
 - Video search and segment click events are also written to `search_events` with `domain: "video"`; multimodal searches are recorded with `mode: "multimodal"`.
 - If network or embedding API access fails during a live demo, lexical search scenarios continue to work, but semantic search requires `VOYAGE_API_KEY` and access to `https://ai.mongodb.com/v1/embeddings`.
 - Video reranking requires access to `https://ai.mongodb.com/v1/rerank`; if unavailable, the video API falls back to retrieval order.

@@ -1,6 +1,6 @@
-# Insta360 Atlas Search PoC
+# Aha360 Atlas Search PoC
 
-This repository contains a MongoDB Atlas Search and Vector Search PoC for Insta360-style product discovery, plus a Next.js UI demo with product search, video segment search, and multimodal video retrieval scenarios.
+This repository contains a MongoDB Atlas Search and Vector Search PoC for Aha360-style product discovery, plus a Next.js UI demo with product search, video segment search, and multimodal video retrieval scenarios.
 
 ## Start Here
 
@@ -49,7 +49,7 @@ Configure `.env.local` with:
 
 ```bash
 MONGODB_URI="<atlas connection string>"
-MONGODB_DB="insta360_poc"
+MONGODB_DB="aha360_poc"
 VOYAGE_API_KEY="<mongodb ai / voyage api key>"
 ```
 

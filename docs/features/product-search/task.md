@@ -2,7 +2,7 @@
 
 ## Objective
 
-Validate and demonstrate MongoDB Atlas Search and Atlas Vector Search for Insta360-style product discovery, including semantic search, keyword search, autocomplete, typo tolerance, synonyms, filtering, fallback recommendations, and analytics preview.
+Validate and demonstrate MongoDB Atlas Search and Atlas Vector Search for Aha360-style product discovery, including semantic search, keyword search, autocomplete, typo tolerance, synonyms, filtering, fallback recommendations, and analytics preview.
 
 ## Feature Summary
 
@@ -22,7 +22,7 @@ MongoDB objects:
 
 | Object | Name | Purpose |
 |---|---|---|
-| Database | `insta360_poc` | PoC database. |
+| Database | `aha360_poc` | PoC database. |
 | Product collection | `products` | Product records and `description_embedding`. |
 | Synonym collection | `synonyms_collection` | Synonym source for Atlas Search. |
 | Event collection | `search_events` | Search and click analytics. |
@@ -63,7 +63,7 @@ Next action:
 | 6 | Query syntax calibration | passed | Seven PoC query scenarios executable. |
 | 7 | Semantic vector retrieval | passed | Diving/waterproof query returns relevant products. |
 | 8 | Keyword ranking with business weight | passed | `自拍杆` ranks weighted results correctly. |
-| 9 | Autocomplete | passed | `Fl` and `稳` return expected suggestions. |
+| 9 | Autocomplete | passed | `St` and `稳` return expected suggestions. |
 | 10 | Fuzzy typo tolerance | passed | `全井相机` recalls panorama cameras. |
 | 11 | Synonym recall | passed | `云台` recalls stabilizer/gimbal products. |
 | 12 | Category and tag filter | passed | `配件` + `骑行` filter returns matching products. |

@@ -1,6 +1,6 @@
 # MongoDB Atlas Search / Vector Search 自助 PoC 操作指南
 
-本文档用于在一个全新的 MongoDB Atlas M10 集群上，自助复现已经演示过的 Insta360 商品搜索 PoC。客户按顺序执行本文中的数据导入、向量生成、索引创建和查询语句后，可以验证以下能力：
+本文档用于在一个全新的 MongoDB Atlas M10 集群上，自助复现已经演示过的 Aha360 商品搜索 PoC。客户按顺序执行本文中的数据导入、向量生成、索引创建和查询语句后，可以验证以下能力：
 
 - 语义向量搜索
 - 关键词搜索
@@ -47,7 +47,7 @@
 |---|---|---|
 | MongoDB Atlas 账号 | 必须 | 用于创建 M10 集群、数据库用户、网络白名单和 Search 索引 |
 | Atlas 集群 | M10 或更高 | 本 PoC 使用 Atlas Vector Search，建议使用 M10 或更高规格 |
-| 数据库用户 | `readWrite` 权限 | 至少需要对 `insta360_poc` 数据库有读写权限 |
+| 数据库用户 | `readWrite` 权限 | 至少需要对 `aha360_poc` 数据库有读写权限 |
 | 网络白名单 | 本机 IP 或公司出口 IP | 否则 `mongosh` 无法连接集群 |
 | `mongosh` | 推荐 2.x 或更新版本 | 用于执行本文中的 JavaScript 语句 |
 | Embedding API Key | Atlas 平台 Voyage AI API Key | 用于生成 `description_embedding` 向量 |
@@ -60,7 +60,7 @@
 
 | 对象 | 名称 |
 |---|---|
-| 数据库 | `insta360_poc` |
+| 数据库 | `aha360_poc` |
 | 商品集合 | `products` |
 | 同义词集合 | `synonyms_collection` |
 | 全文搜索索引 | `default` |
@@ -117,7 +117,7 @@
 |---|---|---|
 | 语义向量搜索 | `我想潜水去水下拍鱼，或者冲浪用，需要能防水防雾的装备` | 自然语言意图理解、Vector Search |
 | 关键词 + 业务权重排序 | `自拍杆` | Atlas Search、BM25、业务权重排序 |
-| Autocomplete 前缀联想 | `Fl`、`稳` | 搜索框下拉提示、前缀召回 |
+| Autocomplete 前缀联想 | `St`、`稳` | 搜索框下拉提示、前缀召回 |
 | 错别字模糊搜索 | `全井相机` | 错别字容错、拼写纠错 |
 | 同义词召回 | `云台` | 运营词库、同义词扩展 |
 | 分类 + 标签过滤 | `category = 配件` 且 `tags = 骑行` | 结构化过滤、搜索结果页筛选 |
@@ -159,11 +159,11 @@
 
 在 Atlas 控制台中进入 `Database Access`，创建数据库用户：
 
-- Username：可自定义，例如 `insta360_poc_user`
+- Username：可自定义，例如 `aha360_poc_user`
 - Password：客户自行生成强密码
-- Role：对 `insta360_poc` 数据库授予 `readWrite`
+- Role：对 `aha360_poc` 数据库授予 `readWrite`
 
-即使是 PoC，也应优先只对 `insta360_poc` 数据库授予 `readWrite`，避免授予跨数据库写权限。
+即使是 PoC，也应优先只对 `aha360_poc` 数据库授予 `readWrite`，避免授予跨数据库写权限。
 
 ### 2.3 配置网络白名单
 
@@ -219,7 +219,7 @@ mongosh "$MONGODB_URI"
 连接成功后执行：
 
 ```javascript
-use insta360_poc;
+use aha360_poc;
 db.runCommand({ ping: 1 });
 ```
 
@@ -234,9 +234,9 @@ db.runCommand({ ping: 1 });
 执行下一章前，请确认：
 
 - 可以通过 `mongosh` 连接 Atlas 集群
-- 已经切换到 `insta360_poc`
+- 已经切换到 `aha360_poc`
 - 已经配置 `VOYAGE_API_KEY`
-- 连接用户对 `insta360_poc` 有读写权限
+- 连接用户对 `aha360_poc` 有读写权限
 
 ---
 
@@ -245,7 +245,7 @@ db.runCommand({ ping: 1 });
 ### 3.1 切换数据库
 
 ```javascript
-use insta360_poc;
+use aha360_poc;
 ```
 
 ### 3.2 导入 20 条商品
@@ -419,7 +419,7 @@ db.products.createSearchIndex('default', {
   },
   synonyms: [
     {
-      name: 'insta360_synonyms',
+      name: 'aha360_synonyms',
       analyzer: 'lucene.chinese',
       source: { collection: 'synonyms_collection' }
     }
@@ -435,7 +435,7 @@ db.products.createSearchIndex('default', {
 | `dynamic: false` | 只索引显式配置字段 | 控制索引范围，减少噪音 |
 | `name` 的 `string` 类型 | 支持商品名称全文检索 | 关键词搜索、错别字纠错 |
 | `name` 的 `autocomplete` 类型 | 支持前缀联想 | 搜索框下拉提示 |
-| `autocomplete.tokenization: 'edgeGram'` | 从词首生成前缀 token | `Fl` 可匹配 Flow |
+| `autocomplete.tokenization: 'edgeGram'` | 从词首生成前缀 token | `St` 可匹配 Stabilizer 系列 |
 | `description` 的 `string` 类型 | 支持商品描述全文检索 | 关键词、同义词 |
 | `category` 的 `token` 类型 | 支持分类精确过滤 | 分类筛选 |
 | `tags` 的 `token` 类型 | 支持标签精确过滤 | 标签筛选 |
@@ -489,7 +489,7 @@ vector_index READY
 
 - `default` 索引已创建并处于 READY
 - `vector_index` 索引已创建并处于 READY
-- `default` 索引中包含同义词 mapping `insta360_synonyms`
+- `default` 索引中包含同义词 mapping `aha360_synonyms`
 
 ---
 
@@ -567,9 +567,9 @@ db.products.aggregate([
 
 | 排名 | 商品 | 说明 |
 |---|---|---|
-| Top 1 | `p14 Insta360 Ace Pro 潜水套装` | 包含潜水、防水、防雾、水下等语义 |
-| Top 2 | `p5 Insta360 GO Ultra 专属深潜水壳` | 明确匹配深潜水壳、防水、防雾 |
-| Top 3 | `p3 Insta360 Ace Pro 2 运动相机` | 描述中包含潜水、冲浪、防水 |
+| Top 1 | `p14 Aha360 ActionCam Pro 潜水套装` | 包含潜水、防水、防雾、水下等语义 |
+| Top 2 | `p5 Aha360 MiniCam Ultra 专属深潜水壳` | 明确匹配深潜水壳、防水、防雾 |
+| Top 3 | `p3 Aha360 ActionCam Pro 2 运动相机` | 描述中包含潜水、冲浪、防水 |
 
 逐行解读：
 
@@ -623,9 +623,9 @@ db.products.aggregate([
 
 | 排名 | 商品 | 说明 |
 |---|---|---|
-| Top 1 | `p6 Insta360 114cm 闪速隐形自拍杆` | 文本相关且 `sale_weight = 1.3` |
-| Top 2 | `p7 Insta360 2合1隐形自拍杆 + 三脚架` | 文本相关但权重略低 |
-| Top 3 | `p2 Insta360 X4 8K全景口袋相机` | 描述中有隐形自拍杆视角 |
+| Top 1 | `p6 Aha360 114cm 闪速隐形自拍杆` | 文本相关且 `sale_weight = 1.3` |
+| Top 2 | `p7 Aha360 2合1隐形自拍杆 + 三脚架` | 文本相关但权重略低 |
+| Top 3 | `p2 Aha360 X-Series Lite 8K全景口袋相机` | 描述中有隐形自拍杆视角 |
 
 逐行解读：
 
@@ -637,7 +637,7 @@ db.products.aggregate([
 
 扩展实验：把 `weightedScore` 改成 `searchScore * (sale_weight + 0.2)`，观察排序是否变化。
 
-### 5.3 场景 3：Autocomplete 前缀联想 - Fl / 稳
+### 5.3 场景 3：Autocomplete 前缀联想 - St / 稳
 
 业务问题：搜索框需要在用户输入早期就给出候选词或候选商品，降低输入成本。
 
@@ -651,7 +651,7 @@ db.products.aggregate([
     $search: {
       index: 'default',
       autocomplete: {
-        query: 'Fl',
+        query: 'St',
         path: 'name'
       }
     }
@@ -666,9 +666,9 @@ db.products.aggregate([
 
 | 商品 |
 |---|
-| `p20 Insta360 Flow 聚光灯补光配件` |
-| `p8 Insta360 Flow 2 Pro AI 手机稳定器` |
-| `p9 Insta360 Flow 2 AI 追踪手机云台` |
+| `p20 Aha360 Stabilizer Series 聚光灯补光配件` |
+| `p8 Aha360 Stabilizer Pro AI 手机稳定器` |
+| `p9 Aha360 Stabilizer AI 追踪手机云台` |
 
 中文前缀查询：
 
@@ -693,7 +693,7 @@ db.products.aggregate([
 
 | 商品 |
 |---|
-| `p8 Insta360 Flow 2 Pro AI 手机稳定器` |
+| `p8 Aha360 Stabilizer Pro AI 手机稳定器` |
 
 逐行解读：
 
@@ -701,7 +701,7 @@ db.products.aggregate([
 - 当前只给 `name` 配置了 autocomplete，因此路径是 `name`。
 - 生产中可以对品牌词、类目词、搜索 query 词库分别建立补全能力。
 
-扩展实验：把 `query` 改成 `In`，观察是否召回更多 Insta360 商品。
+扩展实验：把 `query` 改成 `In`，观察是否召回更多 Aha360 Demo 商品。
 
 ### 5.4 场景 4：错别字模糊搜索 - 全井相机
 
@@ -746,8 +746,8 @@ db.products.aggregate([
 
 | 商品 |
 |---|
-| `p1 Insta360 X5 旗舰全景相机` |
-| `p2 Insta360 X4 8K全景口袋相机` |
+| `p1 Aha360 X-Series Pro 旗舰全景相机` |
+| `p2 Aha360 X-Series Lite 8K全景口袋相机` |
 
 逐行解读：
 
@@ -773,7 +773,7 @@ db.products.aggregate([
       text: {
         query: '云台',
         path: 'description',
-        synonyms: 'insta360_synonyms'
+        synonyms: 'aha360_synonyms'
       }
     }
   },
@@ -800,13 +800,13 @@ db.products.aggregate([
 
 | 商品 | 说明 |
 |---|---|
-| `p8 Insta360 Flow 2 Pro AI 手机稳定器` | 商品描述含稳定器，被云台同义词召回 |
-| `p9 Insta360 Flow 2 AI 追踪手机云台` | 商品描述含云台 |
-| `p20 Insta360 Flow 聚光灯补光配件` | 描述含云台和稳定器 |
+| `p8 Aha360 Stabilizer Pro AI 手机稳定器` | 商品描述含稳定器，被云台同义词召回 |
+| `p9 Aha360 Stabilizer AI 追踪手机云台` | 商品描述含云台 |
+| `p20 Aha360 Stabilizer Series 聚光灯补光配件` | 描述含云台和稳定器 |
 
 逐行解读：
 
-- `synonyms: 'insta360_synonyms'` 必须与索引定义中的同义词名称一致。
+- `synonyms: 'aha360_synonyms'` 必须与索引定义中的同义词名称一致。
 - 同义词来源是 `synonyms_collection`。
 - `mappingType: 'equivalent'` 表示“云台”和“稳定器”双向等价。
 
@@ -864,9 +864,9 @@ db.products.aggregate([
 
 | 排名 | 商品 | 说明 |
 |---|---|---|
-| Top 1 | `p10 Insta360 摩托车骑行配件套装` | 分类为配件，标签包含骑行，描述高度相关 |
-| Top 2 | `p12 Insta360 胸带固定带` | 配件，标签包含骑行 |
-| Top 3 | `p17 Insta360 X5 镜头保护镜` | 配件，标签包含骑行 |
+| Top 1 | `p10 Aha360 摩托车骑行配件套装` | 分类为配件，标签包含骑行，描述高度相关 |
+| Top 2 | `p12 Aha360 胸带固定带` | 配件，标签包含骑行 |
+| Top 3 | `p17 Aha360 X-Series Pro 镜头保护镜` | 配件，标签包含骑行 |
 
 逐行解读：
 
@@ -930,9 +930,9 @@ fallback;
 
 | 排名 | 商品 | `sale_weight` |
 |---|---|---|
-| Top 1 | `p13 Insta360 旗舰创作者套装` | 1.5 |
-| Top 2 | `p1 Insta360 X5 旗舰全景相机` | 1.45 |
-| Top 3 | `p2 Insta360 X4 8K全景口袋相机` | 1.4 |
+| Top 1 | `p13 Aha360 旗舰创作者套装` | 1.5 |
+| Top 2 | `p1 Aha360 X-Series Pro 旗舰全景相机` | 1.45 |
+| Top 3 | `p2 Aha360 X-Series Lite 8K全景口袋相机` | 1.4 |
 
 逐行解读：
 
@@ -948,7 +948,7 @@ fallback;
 
 - 语义搜索能返回潜水、防水、冲浪相关商品
 - `自拍杆` 查询中 `p6` 排在 `p7` 前面
-- `Fl` 能补全 Flow 系列
+- `St` 能补全 稳定器系列
 - `全井相机` 能召回全景相机
 - `云台` 能召回稳定器
 - 分类标签过滤结果都满足 `category = 配件` 且 `tags` 包含 `骑行`
@@ -1067,7 +1067,7 @@ db.products.explain('executionStats').aggregate([
 ```javascript
 db.products.insertOne({
   id: 'p21',
-  name: 'Insta360 水下冲浪拍摄套装',
+  name: 'Aha360 水下冲浪拍摄套装',
   description: '专为冲浪、浮潜和水下旅行准备的防水拍摄套装，包含防雾保护壳、浮力手柄和安全绳。',
   category: '套装',
   tags: ['冲浪', '潜水', '防水', '防雾', '水下'],
@@ -1121,7 +1121,7 @@ db.products.aggregate([
       text: {
         query: '拍摄杆',
         path: 'description',
-        synonyms: 'insta360_synonyms'
+        synonyms: 'aha360_synonyms'
       }
     }
   },
@@ -1288,8 +1288,8 @@ db.products.aggregate([
 处理方式：
 
 - 确认 `synonyms_collection` 中有数据
-- 确认索引中配置了 `synonyms.name = 'insta360_synonyms'`
-- 查询中必须显式写 `synonyms: 'insta360_synonyms'`
+- 确认索引中配置了 `synonyms.name = 'aha360_synonyms'`
+- 查询中必须显式写 `synonyms: 'aha360_synonyms'`
 - 等待索引同步或重建完成
 
 ### 8.6 Autocomplete 没有候选
@@ -1408,7 +1408,7 @@ cp .env.local.example .env.local
 
 ```bash
 MONGODB_URI="<atlas connection string>"
-MONGODB_DB="insta360_poc"
+MONGODB_DB="aha360_poc"
 VOYAGE_API_KEY="<api key>"
 ```
 
@@ -1441,15 +1441,15 @@ PoC 完成后，如果不再需要保留环境，请执行：
 ## 附录 A：完整商品数据
 
 ```javascript
-use insta360_poc;
+use aha360_poc;
 
 db.products.deleteMany({});
 
 db.products.insertMany([
   {
     id: 'p1',
-    name: 'Insta360 X5 旗舰全景相机',
-    description: '旗舰级 8K 全景运动相机，适合旅行、滑雪、骑行和户外创作，支持 FlowState 防抖、夜景增强与可更换镜片。',
+    name: 'Aha360 X-Series Pro 旗舰全景相机',
+    description: '旗舰级 8K 全景运动相机，适合旅行、滑雪、骑行和户外创作，支持 HorizonStable 防抖、夜景增强与可更换镜片。',
     category: '相机',
     tags: ['全景', '8K', '运动相机', '防抖', '骑行', '旅行'],
     price: 3499,
@@ -1458,7 +1458,7 @@ db.products.insertMany([
   },
   {
     id: 'p2',
-    name: 'Insta360 X4 8K全景口袋相机',
+    name: 'Aha360 X-Series Lite 8K全景口袋相机',
     description: '轻便口袋全景相机，支持 8K 全景视频、隐形自拍杆视角和稳定防抖，适合 vlog、摩旅和家庭旅行。',
     category: '相机',
     tags: ['全景', '8K', '口袋相机', '隐形自拍杆', '旅行'],
@@ -1468,7 +1468,7 @@ db.products.insertMany([
   },
   {
     id: 'p3',
-    name: 'Insta360 Ace Pro 2 运动相机',
+    name: 'Aha360 ActionCam Pro 2 运动相机',
     description: '徕卡联合设计的运动相机，具备强低光画质、4K 高帧率、防水机身和智能降噪，适合滑雪、潜水、冲浪和夜骑。',
     category: '相机',
     tags: ['运动相机', '防水', '低光', '潜水', '冲浪'],
@@ -1478,7 +1478,7 @@ db.products.insertMany([
   },
   {
     id: 'p4',
-    name: 'Insta360 GO 3S 拇指相机',
+    name: 'Aha360 MiniCam S 拇指相机',
     description: '超小型拇指运动相机，磁吸佩戴，适合亲子、宠物、骑行第一视角和日常短视频创作。',
     category: '相机',
     tags: ['拇指相机', '轻量', '磁吸', '骑行', 'vlog'],
@@ -1488,8 +1488,8 @@ db.products.insertMany([
   },
   {
     id: 'p5',
-    name: 'Insta360 GO Ultra 专属深潜水壳',
-    description: '为 GO Ultra 设计的深潜水壳，提供可靠密封、防水、防雾和抗压保护，适合潜水、水下拍鱼、浮潜和冲浪拍摄。',
+    name: 'Aha360 MiniCam Ultra 专属深潜水壳',
+    description: '为 MiniCam Ultra 设计的深潜水壳，提供可靠密封、防水、防雾和抗压保护，适合潜水、水下拍鱼、浮潜和冲浪拍摄。',
     category: '配件',
     tags: ['潜水', '防水', '防雾', '冲浪', '水下', '保护壳'],
     price: 399,
@@ -1498,7 +1498,7 @@ db.products.insertMany([
   },
   {
     id: 'p6',
-    name: 'Insta360 114cm 闪速隐形自拍杆',
+    name: 'Aha360 114cm 闪速隐形自拍杆',
     description: '轻量伸缩自拍杆，展开快速，配合全景相机可实现隐形自拍杆视角，适合旅行、滑雪和骑行跟拍。',
     category: '配件',
     tags: ['自拍杆', '隐形自拍杆', '旅行', '骑行', '轻量'],
@@ -1508,7 +1508,7 @@ db.products.insertMany([
   },
   {
     id: 'p7',
-    name: 'Insta360 2合1隐形自拍杆 + 三脚架',
+    name: 'Aha360 2合1隐形自拍杆 + 三脚架',
     description: '自拍杆和三脚架二合一设计，适合桌面直播、延时摄影、全景合影和户外固定机位拍摄。',
     category: '配件',
     tags: ['自拍杆', '三脚架', '隐形自拍杆', '直播', '延时摄影'],
@@ -1518,7 +1518,7 @@ db.products.insertMany([
   },
   {
     id: 'p8',
-    name: 'Insta360 Flow 2 Pro AI 手机稳定器',
+    name: 'Aha360 Stabilizer Pro AI 手机稳定器',
     description: '面向手机创作者的 AI 追踪稳定器，支持智能构图、三轴防抖、手势控制和便携折叠设计。',
     category: '稳定器',
     tags: ['稳定器', '云台', '手机', 'AI追踪', '防抖'],
@@ -1528,7 +1528,7 @@ db.products.insertMany([
   },
   {
     id: 'p9',
-    name: 'Insta360 Flow 2 AI 追踪手机云台',
+    name: 'Aha360 Stabilizer AI 追踪手机云台',
     description: '便携手机云台，提供 AI 人物追踪、稳定拍摄、自拍补光和快速展开，适合直播、短视频和旅行 vlog。',
     category: '稳定器',
     tags: ['云台', '稳定器', '手机', 'AI追踪', '直播'],
@@ -1538,7 +1538,7 @@ db.products.insertMany([
   },
   {
     id: 'p10',
-    name: 'Insta360 摩托车骑行配件套装',
+    name: 'Aha360 摩托车骑行配件套装',
     description: '专为摩托车和公路骑行设计的配件套装，包含坚固支架、防震固定件和安全绳，适合第一视角运动拍摄。',
     category: '配件',
     tags: ['骑行', '摩托车', '支架', '防震', '运动拍摄'],
@@ -1548,7 +1548,7 @@ db.products.insertMany([
   },
   {
     id: 'p11',
-    name: 'Insta360 自行车把手支架',
+    name: 'Aha360 自行车把手支架',
     description: '安装在自行车把手或座管上的轻便支架，适合骑行记录、通勤路线和公路车训练拍摄。',
     category: '配件',
     tags: ['骑行', '自行车', '支架', '轻量'],
@@ -1558,7 +1558,7 @@ db.products.insertMany([
   },
   {
     id: 'p12',
-    name: 'Insta360 胸带固定带',
+    name: 'Aha360 胸带固定带',
     description: '用于运动第一视角拍摄的胸带，适合滑雪、跑步、骑行和徒步，佩戴稳定舒适。',
     category: '配件',
     tags: ['胸带', '第一视角', '骑行', '滑雪', '徒步'],
@@ -1568,7 +1568,7 @@ db.products.insertMany([
   },
   {
     id: 'p13',
-    name: 'Insta360 旗舰创作者套装',
+    name: 'Aha360 旗舰创作者套装',
     description: '高销量创作者套装，包含全景相机、隐形自拍杆、备用电池和收纳包，适合新手快速开始旅行和运动拍摄。',
     category: '套装',
     tags: ['套装', '高销量', '全景', '自拍杆', '旅行'],
@@ -1578,7 +1578,7 @@ db.products.insertMany([
   },
   {
     id: 'p14',
-    name: 'Insta360 Ace Pro 潜水套装',
+    name: 'Aha360 ActionCam Pro 潜水套装',
     description: '面向潜水和水上运动的相机套装，包含防水保护壳、防雾片和浮力手柄，适合水下风景和鱼群拍摄。',
     category: '套装',
     tags: ['潜水', '防水', '防雾', '水下', '运动相机'],
@@ -1588,8 +1588,8 @@ db.products.insertMany([
   },
   {
     id: 'p15',
-    name: 'Insta360 X5 快充电池',
-    description: '为 X5 全景相机准备的备用快充电池，提升户外旅行、滑雪和长时间延时拍摄续航。',
+    name: 'Aha360 X-Series Pro 快充电池',
+    description: '为 X-Series Pro 全景相机准备的备用快充电池，提升户外旅行、滑雪和长时间延时拍摄续航。',
     category: '配件',
     tags: ['电池', '快充', '续航', '全景', '旅行'],
     price: 299,
@@ -1598,7 +1598,7 @@ db.products.insertMany([
   },
   {
     id: 'p16',
-    name: 'Insta360 多功能收纳包',
+    name: 'Aha360 多功能收纳包',
     description: '可收纳相机、镜头保护、自拍杆和电池的便携收纳包，适合旅行携带和日常保护。',
     category: '配件',
     tags: ['收纳', '保护', '旅行', '相机包'],
@@ -1608,7 +1608,7 @@ db.products.insertMany([
   },
   {
     id: 'p17',
-    name: 'Insta360 X5 镜头保护镜',
+    name: 'Aha360 X-Series Pro 镜头保护镜',
     description: '可拆卸镜头保护镜，降低全景相机在骑行、滑雪和户外运动中被刮花的风险。',
     category: '配件',
     tags: ['镜头保护', '全景', '骑行', '滑雪', '保护'],
@@ -1618,7 +1618,7 @@ db.products.insertMany([
   },
   {
     id: 'p18',
-    name: 'Insta360 GPS 预览遥控器',
+    name: 'Aha360 GPS 预览遥控器',
     description: '带屏幕预览和 GPS 数据记录的遥控器，可远程控制相机并记录速度、路线和海拔信息。',
     category: '配件',
     tags: ['GPS', '遥控器', '骑行', '路线', '数据'],
@@ -1628,7 +1628,7 @@ db.products.insertMany([
   },
   {
     id: 'p19',
-    name: 'Insta360 Link 2C 直播摄像头',
+    name: 'Aha360 WebCam C 直播摄像头',
     description: '桌面直播和会议摄像头，支持 4K 画质、智能取景、自动对焦和清晰收音，适合办公与主播。',
     category: '摄像头',
     tags: ['直播', '会议', '4K', '自动对焦', '桌面'],
@@ -1638,8 +1638,8 @@ db.products.insertMany([
   },
   {
     id: 'p20',
-    name: 'Insta360 Flow 聚光灯补光配件',
-    description: '适配 Flow 系列手机云台和稳定器的小型补光灯，适合夜景自拍、直播和短视频拍摄。',
+    name: 'Aha360 Stabilizer Series 聚光灯补光配件',
+    description: '适配 稳定器系列手机云台和稳定器的小型补光灯，适合夜景自拍、直播和短视频拍摄。',
     category: '配件',
     tags: ['补光灯', '云台', '稳定器', '手机', '直播'],
     price: 149,
@@ -1676,7 +1676,7 @@ db.products.createSearchIndex('default', {
   },
   synonyms: [
     {
-      name: 'insta360_synonyms',
+      name: 'aha360_synonyms',
       analyzer: 'lucene.chinese',
       source: { collection: 'synonyms_collection' }
     }

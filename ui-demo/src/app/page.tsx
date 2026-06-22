@@ -19,37 +19,45 @@ const capabilityCards = [
 ];
 
 async function getProducts() {
-  const db = await getAppDb();
+  try {
+    const db = await getAppDb();
 
-  return db
-    .collection<Product>("products")
-    .find(
-      {},
-      {
-        projection: {
-          _id: 0,
-          id: 1,
-          name: 1,
-          description: 1,
-          category: 1,
-          tags: 1,
-          price: 1,
-          sale_weight: 1,
-          language: 1,
+    const products = await db
+      .collection<Product>("products")
+      .find(
+        {},
+        {
+          projection: {
+            _id: 0,
+            id: 1,
+            name: 1,
+            description: 1,
+            category: 1,
+            tags: 1,
+            price: 1,
+            sale_weight: 1,
+            language: 1,
+          },
         },
-      },
-    )
-    .sort({ sale_weight: -1, id: 1 })
-    .toArray();
+      )
+      .sort({ sale_weight: -1, id: 1 })
+      .toArray();
+
+    return { products, unavailable: false };
+  } catch (error) {
+    console.error("Product list unavailable", error);
+
+    return { products: [] as Product[], unavailable: true };
+  }
 }
 
 export default async function Home() {
-  const products = await getProducts();
+  const { products, unavailable } = await getProducts();
 
   return (
     <main className="min-h-screen bg-[#f5f5f2] text-zinc-950">
       <section className="bg-black px-4 py-2 text-center text-xs font-medium text-white sm:text-sm">
-        MongoDB Atlas Search + Vector Search 智能商品搜索 Demo | 基于已通过的 Insta360 PoC 数据
+        MongoDB Atlas Search + Vector Search 智能商品搜索 Demo | 基于已通过的 Aha360 PoC 数据
       </section>
 
       <section id="demo" className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
@@ -102,6 +110,14 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {unavailable ? (
+        <section className="mx-auto max-w-7xl px-4 pb-2 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+            商品数据库暂时不可达，页面已降级加载。请检查 MongoDB 网络连接或 `.env.local` 配置后刷新。
+          </div>
+        </section>
+      ) : null}
 
       <SearchDemo initialProducts={products} />
     </main>

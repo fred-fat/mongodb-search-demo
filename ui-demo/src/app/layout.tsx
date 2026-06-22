@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Insta360 Atlas Search Demo",
+  title: "Aha360 Atlas Search Demo",
   description: "MongoDB Atlas Search and Vector Search UI demo for product discovery.",
 };
 

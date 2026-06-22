@@ -94,7 +94,7 @@ async function main() {
     throw new Error(`Sample video not found: ${sampleVideoPath}`);
   }
 
-  const tempDir = mkdtempSync(path.join(tmpdir(), "insta360-multimodal-"));
+  const tempDir = mkdtempSync(path.join(tmpdir(), "aha360-multimodal-"));
   const clipPath = path.join(tempDir, "sample-clip.mp4");
 
   execFileSync(

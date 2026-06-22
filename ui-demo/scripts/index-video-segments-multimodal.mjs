@@ -177,7 +177,7 @@ async function main() {
   const client = new MongoClient(MONGODB_URI);
   await client.connect();
 
-  const tempDir = mkdtempSync(path.join(tmpdir(), "insta360-multimodal-index-"));
+  const tempDir = mkdtempSync(path.join(tmpdir(), "aha360-multimodal-index-"));
 
   try {
     const segments = client.db(MONGODB_DB).collection("video_segments");

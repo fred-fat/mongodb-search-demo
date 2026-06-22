@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const schemaExample = `{
   id: "p1",
-  name: "Insta360 X5 旗舰全景相机",
+  name: "Aha360 X-Series Pro 旗舰全景相机",
   description: "旗舰级 8K 全景运动相机，适合旅行、滑雪、骑行...",
   category: "相机",
   tags: ["全景", "8K", "运动相机", "防抖", "骑行", "旅行"],
@@ -31,7 +31,7 @@ const searchIndexConfigs = [
   {
     config: "name: autocomplete + edgeGram",
     purpose: "按商品名前缀生成补全 token，用户输入早期即可返回建议。",
-    scenarios: "Flow 自动补全",
+    scenarios: "稳定器自动补全",
   },
   {
     config: "description: string",
@@ -49,7 +49,7 @@ const searchIndexConfigs = [
     scenarios: "骑行配件筛选",
   },
   {
-    config: "synonyms: insta360_synonyms",
+    config: "synonyms: aha360_synonyms",
     purpose: "从 synonyms_collection 读取同义词，例如 云台 <=> 稳定器。",
     scenarios: "云台同义词",
   },
