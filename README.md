@@ -1,5 +1,7 @@
 # Aha360 Atlas Search PoC
 
+[中文说明](README.zh-CN.md)
+
 This repository contains a MongoDB Atlas Search and Vector Search PoC for Aha360-style product discovery, plus a Next.js UI demo with product search, video segment search, and multimodal video retrieval scenarios.
 
 ## Start Here
@@ -52,6 +54,13 @@ MONGODB_URI="<atlas connection string>"
 MONGODB_DB="aha360_poc"
 VOYAGE_API_KEY="<mongodb ai / voyage api key>"
 ```
+
+Create both credentials from MongoDB Atlas:
+
+- `MONGODB_URI`: In Atlas, create or select a cluster, create a database user with `readWrite` access to `aha360_poc`, allow your client IP in Network Access, then use `Connect` -> `Drivers` or `Shell` to copy the `mongodb+srv://...` connection string. Replace the username, password, and cluster host in `.env.local`; do not commit this file.
+- `VOYAGE_API_KEY`: In Atlas, create a MongoDB AI / Voyage AI API key from the Atlas platform and put it in `.env.local`. This project calls MongoDB AI Gateway endpoints such as `https://ai.mongodb.com/v1/embeddings`, `https://ai.mongodb.com/v1/multimodalembeddings`, and `https://ai.mongodb.com/v1/rerank`.
+
+Do not use the public Voyage endpoint directly for this demo; the configured key is expected to work through MongoDB Atlas / MongoDB AI Gateway.
 
 For video search setup, run inside `ui-demo/` after environment variables are configured:
 

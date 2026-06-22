@@ -6,7 +6,7 @@ Interactive Next.js demo for showcasing MongoDB Atlas Search, Vector Search, hyb
 
 - Node.js 20 or newer; 22 LTS recommended
 - MongoDB Atlas connection string configured in `.env.local`
-- `VOYAGE_API_KEY` configured in `.env.local` for semantic search
+- MongoDB AI / Voyage API key from Atlas configured as `VOYAGE_API_KEY` in `.env.local`
 - Local test videos under the repository root `video-src/` for the video search scenario
 
 ## Environment
@@ -20,6 +20,24 @@ VOYAGE_API_KEY="<mongodb ai / voyage api key>"
 ```
 
 Do not expose these values to client-side code. `.env.local` is ignored by git.
+
+Create the values in MongoDB Atlas:
+
+1. Create or select an Atlas cluster.
+2. Create a database user and grant `readWrite` on `aha360_poc`.
+3. Add your local IP address in Atlas Network Access.
+4. Use Atlas `Connect` to copy the `mongodb+srv://...` URI into `MONGODB_URI`.
+5. Create a MongoDB AI / Voyage AI API key from the Atlas platform and set it as `VOYAGE_API_KEY`.
+
+This app uses MongoDB AI Gateway endpoints only:
+
+```text
+https://ai.mongodb.com/v1/embeddings
+https://ai.mongodb.com/v1/multimodalembeddings
+https://ai.mongodb.com/v1/rerank
+```
+
+Do not put the real URI or API key in source files, screenshots, or commits.
 
 ## Commands
 
