@@ -22,8 +22,10 @@ coverage/
 # generated files
 *.tsbuildinfo
 next-env.d.ts
-uploaded-video-src/
-video-src/
+uploaded-video-src/*
+video-src/*
+!uploaded-video-src/.gitkeep
+!video-src/.gitkeep
 
 # local agent/tool config
 opencode.json
