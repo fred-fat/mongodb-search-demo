@@ -1,6 +1,6 @@
-# Aha360 Atlas Search PoC
+# Atlas Search PoC
 
-本项目是一个基于 MongoDB Atlas Search、Atlas Vector Search 和 MongoDB AI Gateway 的智能搜索 PoC。它包含商品搜索 Demo、视频检索 Demo、视频多模态检索、视频上传自动处理和运营分析预览。
+本虚拟项目Aha360 是一个基于 MongoDB Atlas Search、Atlas Vector Search 和 Voyage AI 的智能搜索 PoC。它包含商品搜索 Demo、视频检索 Demo、视频多模态检索、视频上传自动处理和运营分析预览。
 
 ## 优先阅读
 
@@ -88,7 +88,7 @@ VOYAGE_API_KEY="<mongodb ai / voyage api key>"
 1. 在 MongoDB Atlas 平台创建 MongoDB AI / Voyage AI API Key。
 2. 将 key 写入 `.env.local` 的 `VOYAGE_API_KEY`。
 
-本项目只调用 MongoDB AI Gateway：
+本项目只调用Atlas平台的 Voyage AI API：
 
 ```text
 https://ai.mongodb.com/v1/embeddings
